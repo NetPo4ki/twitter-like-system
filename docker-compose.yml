@@ -1,0 +1,61 @@
+services:
+  user-service:
+    build:
+      context: ./user-service
+    ports:
+      - "8080:8080"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      USER_DB_NAME: user_db
+      POSTGRES_HOST_USER: db
+      POSTGRES_PORT_USER: 5432
+    depends_on:
+      - db
+
+  message-service:
+    build:
+      context: ./message-service
+    ports:
+      - "8081:8081"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      MESSAGE_DB_NAME: message_db
+      POSTGRES_HOST_MESSAGE: db
+      POSTGRES_PORT_MESSAGE: 5432
+      USER_SERVICE_HOST: user-service
+      USER_SERVICE_PORT: 8080
+    depends_on:
+      - db
+      - user-service
+
+  like-service:
+    build:
+      context: ./like-service
+    ports:
+      - "8082:8082"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      LIKE_DB_NAME: like_db
+      POSTGRES_HOST_LIKE: db
+      POSTGRES_PORT_LIKE: 5432
+      MESSAGE_SERVICE_HOST: message-service
+      MESSAGE_SERVICE_PORT: 8081
+    depends_on:
+      - db
+      - message-service
+
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: users
+      PGPORT: 5432
+    volumes:
+      - a5-pgdata:/var/lib/postgresql/data
+
+volumes:
+  a5-pgdata:
