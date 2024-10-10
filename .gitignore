@@ -1,1 +1,4 @@
 /.env
+/like-service/.env
+/message-service/.env
+/user-service/.env
